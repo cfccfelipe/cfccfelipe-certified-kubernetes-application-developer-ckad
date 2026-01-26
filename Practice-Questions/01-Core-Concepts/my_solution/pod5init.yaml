@@ -1,0 +1,150 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2026-01-26T16:21:50Z"
+  generateName: webapp-59d7f55d4d-
+  generation: 1
+  labels:
+    app: webapp
+    pod-template-hash: 59d7f55d4d
+    version: v1
+  name: webapp-59d7f55d4d-bf4lr
+  namespace: default
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: ReplicaSet
+    name: webapp-59d7f55d4d
+    uid: 68b1dd34-21fb-4fab-b0f8-75155a456f30
+  resourceVersion: "76677"
+  uid: ac3263d9-9d06-403b-a534-2984c5a53e9a
+spec:
+  containers:
+  - env:
+    - name: APP_NAME
+      value: WebApp
+    - name: ENVIRONMENT
+      value: production
+    image: nginx:1.21-alpine
+    imagePullPolicy: IfNotPresent
+    name: webapp
+    ports:
+    - containerPort: 80
+      protocol: TCP
+    resources:
+      limits:
+        cpu: 200m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wwlbh
+      readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: minikube
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - name: kube-api-access-wwlbh
+    projected:
+      defaultMode: 420
+      sources:
+      - serviceAccountToken:
+          expirationSeconds: 3607
+          path: token
+      - configMap:
+          items:
+          - key: ca.crt
+            path: ca.crt
+          name: kube-root-ca.crt
+      - downwardAPI:
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+            path: namespace
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2026-01-26T16:21:55Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodReadyToStartContainers
+  - lastProbeTime: null
+    lastTransitionTime: "2026-01-26T16:21:50Z"
+    observedGeneration: 1
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2026-01-26T16:21:55Z"
+    observedGeneration: 1
+    status: "True"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2026-01-26T16:21:55Z"
+    observedGeneration: 1
+    status: "True"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2026-01-26T16:21:50Z"
+    observedGeneration: 1
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - allocatedResources:
+      cpu: 100m
+      memory: 64Mi
+    containerID: docker://db9bf70e1ca7f5a914048db351debd6ecdb61ea64ca9479994b5e694af54008f
+    image: nginx:1.21-alpine
+    imageID: docker-pullable://nginx@sha256:a74534e76ee1121d418fa7394ca930eb67440deda413848bc67c68138535b989
+    lastState: {}
+    name: webapp
+    ready: true
+    resources:
+      limits:
+        cpu: 200m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+    restartCount: 0
+    started: true
+    state:
+      running:
+        startedAt: "2026-01-26T16:21:54Z"
+    volumeMounts:
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: kube-api-access-wwlbh
+      readOnly: true
+      recursiveReadOnly: Disabled
+  hostIP: 192.168.49.2
+  hostIPs:
+  - ip: 192.168.49.2
+  observedGeneration: 1
+  phase: Running
+  podIP: 10.244.0.242
+  podIPs:
+  - ip: 10.244.0.242
+  qosClass: Burstable
+  startTime: "2026-01-26T16:21:50Z"
