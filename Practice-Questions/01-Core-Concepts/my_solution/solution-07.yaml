@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: frontend
+  name: frontend
+  namespace: production
+spec:
+  containers:
+  - image: nginx
+    name: frontend
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  nodeSelector:
+    disktype: ssd
+status: {}
