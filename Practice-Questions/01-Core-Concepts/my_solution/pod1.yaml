@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: web
+    tier: frontend
+    run: nginx-pod
+  name: nginx-pod
+spec:
+  containers:
+  - image: nginx:1.21
+    name: nginx-pod
+    resources: {}
+    ports:
+    - containerPort: 80
+    resources:
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  
+status: {}
