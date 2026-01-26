@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: always-restart
+  name: always-restart
+spec:
+  containers:
+    - image: nginx
+      name: always-restart
+      resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: never-restart
+  name: never-restart
+spec:
+  containers:
+    - image: nginx
+      name: never-restart
+      command: ['sleep']
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+status: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: onfailure-restart
+  name: onfailure-restart
+spec:
+  containers:
+    - image: nginx 
+      name: onfailure-restart
+      resources: {}
+      command: ['sleep']
+  dnsPolicy: ClusterFirst
+  restartPolicy: OnFailure
+status: {}

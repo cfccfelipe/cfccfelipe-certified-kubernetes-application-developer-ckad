@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: onfailure-restart 
+  name: onfailure-restart 
+spec:
+  containers:
+  - image: busybox
+    name: onfailure-restart
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: OnFailure
+status: {}

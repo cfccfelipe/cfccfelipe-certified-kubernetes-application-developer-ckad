@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: always-restart
+  name: always-restart
+spec:
+  containers:
+  - image: nginx 
+    name: always-restart
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
