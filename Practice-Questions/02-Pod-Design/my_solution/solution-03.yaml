@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: strategies
+  name: strategies
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: strategies
+  template:
+    metadata:
+      labels:
+        app: strategies
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+status: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: nginx-deployment-recreate
+ labels:
+   app: nginx
+spec:
+ replicas: 5
+ selector:
+   matchLabels:
+     app: nginx
+ template:
+   metadata:
+     labels:
+       app: nginx
+   spec:
+     containers:
+     - name: nginx
+       image: nginx:1.14.2
+       ports:
+       - containerPort: 80
+ strategy:
+   type: Recreate
