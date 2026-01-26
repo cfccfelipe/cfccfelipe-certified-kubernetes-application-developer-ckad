@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: network-test
+  name: network-test
+spec:
+  containers:
+  - image: nginx:1.21
+    name: nginx-net
+    ports:
+    - containerPort: 80
+    resources: {}
+  - image: busybox
+    name: busy-net
+    command: ["sh","-c", "wget localhost -O- && sleep 3600"]
+  restartPolicy: Always
+status: {}
