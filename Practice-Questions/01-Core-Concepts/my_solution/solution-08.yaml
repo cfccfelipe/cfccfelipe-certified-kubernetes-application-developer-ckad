@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: custom-cmd
+  name: custom-cmd
+spec:
+  containers:
+  - image: busybox:1.36
+    name: custom-cmd
+    resources: {}
+    command: ["sh", "-c"]
+    args:
+      - "while true; do date; sleep 10; done"
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
