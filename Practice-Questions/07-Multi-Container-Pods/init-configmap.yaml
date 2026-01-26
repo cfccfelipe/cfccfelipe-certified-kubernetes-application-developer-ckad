@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-raw
+  namespace: default
+data:
+  database.properties: |
+    host=mysql-service
+    port=3306
+    user=app_user
+  application.properties: |
+    app.name=MyApplication
+    app.version=1.0.0
+    app.environment=production
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-config-pod
+  namespace: default
+  labels:
+    app: config-processor
+spec:
+  # Init container to process ConfigMap
+  initContainers:
+  - name: config-processor
+    image: busybox:1.36
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo "Processing configuration files..."
+
+      # Read and process database config
+      echo "[Database Configuration]" > /processed-config/config.ini
+      cat /raw-config/database.properties | sed 's/=/: /g' >> /processed-config/config.ini
+
+      echo "" >> /processed-config/config.ini
+      echo "[Application Configuration]" >> /processed-config/config.ini
+      cat /raw-config/application.properties | sed 's/=/: /g' >> /processed-config/config.ini
+
+      echo "Configuration processing complete!"
+      cat /processed-config/config.ini
+    volumeMounts:
+    - name: raw-config
+      mountPath: /raw-config
+    - name: processed-config
+      mountPath: /processed-config
+
+  # Main application container
+  containers:
+  - name: app
+    image: busybox:1.36
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo "Application starting..."
+      echo "Using configuration from /etc/config/config.ini"
+      cat /etc/config/config.ini
+      sleep 3600
+    volumeMounts:
+    - name: processed-config
+      mountPath: /etc/config
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+
+  # Volumes
+  volumes:
+  - name: raw-config
+    configMap:
+      name: app-config-raw
+  - name: processed-config
+    emptyDir: {}
+
+  restartPolicy: Always

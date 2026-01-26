@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: default
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend-app
+        image: busybox:1.36
+        command: ["sh", "-c", "env | grep DB_ && sleep 3600"]
+        env:
+        - name: DB_USER
+          value: "admin"        # HARDCODED - should be from Secret
+        - name: DB_PASS
+          value: "SecurePassword123!"  # HARDCODED - should be from Secret
+        - name: DB_HOST
+          value: "mysql-service.default.svc.cluster.local"
+        - name: DB_PORT
+          value: "3306"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"

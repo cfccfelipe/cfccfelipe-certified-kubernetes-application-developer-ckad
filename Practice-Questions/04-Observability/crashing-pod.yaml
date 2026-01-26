@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crashing-pod
+  namespace: default
+  labels:
+    app: crash-demo
+spec:
+  containers:
+  - name: app
+    image: busybox:1.36
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo "Starting application..."
+      echo "Connecting to database at $DB_HOST:$DB_PORT"
+
+      # BUG: DB_HOST is not defined, will cause error
+      if [ -z "$DB_HOST" ]; then
+        echo "ERROR: DB_HOST environment variable is not set!"
+        exit 1
+      fi
+
+      # BUG: Missing config file
+      if [ ! -f /config/app.conf ]; then
+        echo "ERROR: Configuration file /config/app.conf not found!"
+        exit 1
+      fi
+
+      echo "Application running..."
+      sleep 3600
+    env:
+    # BUG: DB_PORT is defined but DB_HOST is missing
+    - name: DB_PORT
+      value: "3306"
+    # volumeMounts is commented out - config file won't be available
+    # volumeMounts:
+    # - name: config
+    #   mountPath: /config
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "50m"
+  # volumes is commented out
+  # volumes:
+  # - name: config
+  #   configMap:
+  #     name: app-config
+  restartPolicy: Always

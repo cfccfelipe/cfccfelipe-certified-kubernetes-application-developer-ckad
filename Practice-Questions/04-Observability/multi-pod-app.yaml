@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-pod-app
+  namespace: default
+  labels:
+    app: logging-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: logging-demo
+  template:
+    metadata:
+      labels:
+        app: logging-demo
+        version: v1
+    spec:
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sh", "-c"]
+        args:
+        - |
+          echo "Pod $HOSTNAME started at $(date)"
+          counter=0
+          while true; do
+            counter=$((counter + 1))
+            timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+            # Generate different types of log messages
+            case $((counter % 5)) in
+              0)
+                echo "[$timestamp] INFO: Processing request #$counter in pod $HOSTNAME"
+                ;;
+              1)
+                echo "[$timestamp] DEBUG: Database query executed successfully"
+                ;;
+              2)
+                echo "[$timestamp] WARN: High memory usage detected: 75%"
+                ;;
+              3)
+                echo "[$timestamp] ERROR: Failed to connect to cache service"
+                ;;
+              4)
+                echo "[$timestamp] INFO: Health check passed"
+                ;;
+            esac
+
+            sleep 5
+          done
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"

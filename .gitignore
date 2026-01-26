@@ -1,0 +1,13 @@
+# IDE and editor folders
+.codemie/
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~

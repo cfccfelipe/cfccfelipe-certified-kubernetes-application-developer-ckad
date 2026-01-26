@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: logging-pod
+  namespace: default
+  labels:
+    app: nginx-with-logging
+spec:
+  containers:
+  # Main application container
+  - name: nginx-app
+    image: nginx:1.21
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: log-volume
+      mountPath: /var/log/nginx
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+      limits:
+        memory: "128Mi"
+        cpu: "200m"
+
+  # Sidecar log collector container
+  - name: log-collector
+    image: busybox:1.36
+    command: ["sh", "-c"]
+    args:
+    - |
+      echo "Log collector started"
+      while true; do
+        if [ -f /var/log/nginx/access.log ]; then
+          echo "=== Access Log at $(date) ==="
+          tail -n 5 /var/log/nginx/access.log
+        fi
+        sleep 10
+      done
+    volumeMounts:
+    - name: log-volume
+      mountPath: /var/log/nginx
+    resources:
+      requests:
+        memory: "32Mi"
+        cpu: "50m"
+      limits:
+        memory: "64Mi"
+        cpu: "100m"
+
+  # Shared volume for logs
+  volumes:
+  - name: log-volume
+    emptyDir: {}
+
+  restartPolicy: Always
