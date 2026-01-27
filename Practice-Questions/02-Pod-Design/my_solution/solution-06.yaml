@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: canary 
+ labels:
+   app: go
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: go
+ template:
+   metadata:
+     labels:
+       app: go
+   spec:
+     containers:
+     - name: nginx
+       image: nginx:1.14.2
+       ports:
+       - containerPort: 80
+ strategy:
+   type: RollingUpdate
+   rollingUpdate:
+     maxSurge: 20%
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: stable
+ labels:
+   app: go
+spec:
+ replicas: 4
+ selector:
+   matchLabels:
+     app: go
+ template:
+   metadata:
+     labels:
+       app: go
+   spec:
+     containers:
+     - name: nginx
+       image: nginx:1.14.2
+       ports:
+       - containerPort: 80
