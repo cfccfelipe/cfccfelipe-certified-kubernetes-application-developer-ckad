@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-test
+  labels:
+    env: prod
+    tier: frontend
+spec:
+  containers:
+    - name: cuda-test
+      image: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-test2
+  labels:
+    env: dev
+    tier: frontend
+spec:
+  containers:
+    - name: cuda-test
+      image: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-test3
+  labels:
+    env: prod
+    tier: backend
+spec:
+  containers:
+    - name: cuda-test
+      image: nginx
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cuda-test4
+  labels:
+    env: dev
+    tier: backend
+spec:
+  containers:
+    - name: cuda-test
+      image: nginx
