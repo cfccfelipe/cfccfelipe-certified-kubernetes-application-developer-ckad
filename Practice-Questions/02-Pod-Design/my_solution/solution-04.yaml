@@ -1,0 +1,50 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-processor 
+spec:
+  completions: 10
+  parallelism: 5
+  activeDeadlineSeconds: 30
+  completionMode: Indexed
+  backoffLimitPerIndex: 2 
+  ttlSecondsAfterFinished: 20
+  template:
+    spec:
+      restartPolicy: Never 
+      containers:
+      - name: example
+        image: python
+        command: ["python3", "-c"]
+        args:
+          - |
+            import os, sys
+            index = os.environ.get("JOB_COMPLETION_INDEX")
+            print(f'Hello world from index {index}')
+            sys.exit(0) 
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-job
+spec:
+  schedule: "30 * * * *"           # Runs at minute 30 of every hour
+  successfulJobsHistoryLimit: 3    # Keeps the last 3 successful jobs
+  failedJobsHistoryLimit: 1        # Keeps the last failed job for debugging
+  startingDeadlineSeconds: 100     # If the controller misses the start time, it has 100s to catch up
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 30
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox:1.28
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+          restartPolicy: OnFailure
+
