@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources
+spec:
+  hard:
+    requests.cpu: "500m"
+    requests.memory: "512Mi"
+    pods: 3
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+      resources:
+          requests:
+            cpu: "10m"      # 0.1 cores
+            memory: "18Mi"  # 128 Megabytes
+          limits:
+            cpu: "50m"      # Máximo 0.5 cores
+            memory: "26Mi"  # Máximo 256 Megabytes
