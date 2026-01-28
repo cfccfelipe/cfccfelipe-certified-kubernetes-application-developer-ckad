@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+  - image: nginx 
+    name: test-container
+    command: ["sh", "-c","touch ./cache/container1.txt && ls -ld cache && sleep 500"]
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  - image: nginx 
+    name: test-container2
+    command: ["sh", "-c","touch ./cache/container2.txt && ls cache && sleep 5000"]
+    volumeMounts:
+    - mountPath: /cache
+      name: cache-volume
+  securityContext:
+    fsGroup: 2000
+  volumes:
+  - name: cache-volume
+    emptyDir:
+      sizeLimit: 500Mi
