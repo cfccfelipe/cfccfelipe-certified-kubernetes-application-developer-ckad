@@ -1,0 +1,34 @@
+apiVersion: v1
+data:
+  api-keys: |
+    API_1=2103102013
+    API_2=1230120301
+    API_3=1203013012
+  app-config: |+
+    cache=20
+    timeout=20
+    host=192.10.0.1
+
+kind: ConfigMap
+metadata:
+  name: multi-conf
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mypod
+    image: nginx
+    command: ["sh","-c"]
+    args:
+      - ls /map && cat /map/app-config
+    volumeMounts:
+    - name: foo
+      mountPath: "/map"
+      readOnly: true
+  volumes:
+  - name: foo
+    configMap:
+      name: multi-conf
