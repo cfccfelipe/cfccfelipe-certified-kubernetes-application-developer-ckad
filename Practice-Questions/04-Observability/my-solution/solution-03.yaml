@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    app: monitor-test
+  name: resource-demo
+  namespace: practice
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: monitor-test
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: monitor-test
+    spec:
+      containers:
+      - args:
+        - --cpus
+        - "1"
+        - --mem-total
+        - 150Mi
+        - --mem-alloc-size
+        - 10Mi
+        - --mem-alloc-sleep
+        - 1s
+        image: vish/stress
+        imagePullPolicy: Always
+        name: busy-worker
+        resources:
+          limits:
+            cpu: "1500m" 
+            memory: 320Mi
+          requests:
+            cpu: "1000m"
+            memory: 160Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      - image: nginx:alpine
+        imagePullPolicy: IfNotPresent
+        name: silent-nginx
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 2
+  conditions:
+  - lastTransitionTime: "2026-01-28T21:35:21Z"
+    lastUpdateTime: "2026-01-28T21:35:21Z"
+    message: Deployment has minimum availability.
+    reason: MinimumReplicasAvailable
+    status: "True"
+    type: Available
+  - lastTransitionTime: "2026-01-28T21:35:09Z"
+    lastUpdateTime: "2026-01-28T21:35:21Z"
+    message: ReplicaSet "resource-demo-8dd9dd7b8" has successfully progressed.
+    reason: NewReplicaSetAvailable
+    status: "True"
+    type: Progressing
+  observedGeneration: 1
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2
