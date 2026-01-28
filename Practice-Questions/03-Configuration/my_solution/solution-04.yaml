@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-resources
+spec:
+  hard:
+    requests.cpu: 1
+    requests.memory: 1Gi
+    pods: 5
+
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: range
+spec:
+  limits:
+  - default:                # Límite por defecto si el pod no lo trae
+      cpu: 200m
+      memory: 256Mi
+    min:                    # Lo mínimo que un pod puede pedir
+      cpu: 50m
+      memory: 64Mi
+    type: Container
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: excess
+  labels:
+    app: nginx
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
