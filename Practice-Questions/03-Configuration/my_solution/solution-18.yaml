@@ -1,0 +1,28 @@
+apiVersion: v1
+data:
+  key: value
+kind: ConfigMap
+metadata:
+  name: inmutable
+immutable: true
+
+---
+apiVersion: v1
+data:
+  key: dmFsdWU=
+kind: Secret
+metadata:
+  name: inmutable
+immutable: true
+
+---
+apiVersion: v1
+data:
+  key: value
+  test: pass
+kind: ConfigMap
+metadata:
+  name: inmutable-v2
+immutable: true
+
+
