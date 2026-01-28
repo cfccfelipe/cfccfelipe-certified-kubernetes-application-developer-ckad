@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: custom-sa 
+  namespace: practice
+secrets:
+  - name: custom-token
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: custom-token
+  namespace: practice
+  labels:
+    kubernetes.io/legacy-token-last-used: 2022-10-24
+    kubernetes.io/legacy-token-invalid-since: 2023-10-25
+  annotations:
+    kubernetes.io/service-account.name: custom-token
+type: kubernetes.io/service-account-token
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: svcpod
+spec:
+  serviceAccountName: custom-sa
+  containers:
+  - image: nginx
+    name: nginx
+    command: ["sh","-c", "cat /var/run/secrets/kubernetes.io/serviceaccount/token"]
