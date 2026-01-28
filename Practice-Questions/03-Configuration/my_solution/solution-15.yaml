@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dapi-envars-resourcefieldref
+spec:
+  containers:
+    - name: test-container
+      image: busybox
+      command: [ "sh", "-c"]
+      args:
+      - while true; do
+          echo -en '\n';
+          printenv APP_ENV SECRET_KEY CONFIG_KEY;
+          printenv CPU_LIMIT POD_NAME;
+          sleep 10;
+        done;
+      resources:
+        requests:
+          memory: "32Mi"
+          cpu: "125m"
+        limits:
+          memory: "64Mi"
+          cpu: "250m"
+      env:
+        - name: APP_ENV
+          value: production
+        - name: CONFIG_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: envcm
+              key: CONFIG_KEY
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: envs
+              key: SECRET_KEY
+        - name: CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: test-container
+              resource: limits.cpu
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
