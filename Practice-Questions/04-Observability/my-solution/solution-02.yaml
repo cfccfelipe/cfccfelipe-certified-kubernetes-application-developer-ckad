@@ -1,0 +1,106 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-demo
+data:
+  app.conf: |
+    enemy.types=aliens,monsters
+    player.maximum-lives=5    
+---
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: fix-pod
+    labels:
+      app: crash-demo
+      namespace: practice
+  spec:
+    containers:
+    - args:
+      - |
+        echo "Starting application..."
+        echo "Connecting to database at $DB_HOST:$DB_PORT"
+
+        # BUG: DB_HOST is not defined, will cause error
+        if [ -z "$DB_HOST" ]; then
+          echo "ERROR: DB_HOST environment variable is not set!"
+          exit 1
+        fi
+
+        # BUG: Missing config file
+        if [ ! -f /config/app.conf ]; then
+          echo "ERROR: Configuration file /config/app.conf not found!"
+          exit 1
+        fi
+
+        echo "Application running..."
+        sleep 3600
+      command:
+      - sh
+      - -c
+      env:
+      - name: DB_PORT
+        value: "3306"
+      - name: DB_HOST
+        value: api.api.api
+      image: nginx
+      imagePullPolicy: IfNotPresent
+      name: app
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: kube-api-access-9wkfw
+        readOnly: true
+      - name: config
+        mountPath: "/config"
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    enableServiceLinks: true
+    nodeName: minikube
+    preemptionPolicy: PreemptLowerPriority
+    priority: 0
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    tolerations:
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+    volumes:
+    - name: config
+      configMap:
+        # Provide the name of the ConfigMap you want to mount.
+        name: game-demo
+    - name: kube-api-access-9wkfw
+      projected:
+        defaultMode: 420
+        sources:
+        - serviceAccountToken:
+            expirationSeconds: 3607
+            path: token
+        - configMap:
+            items:
+            - key: ca.crt
+              path: ca.crt
+            name: kube-root-ca.crt
+        - downwardAPI:
+            items:
+            - fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+              path: namespace
+
+
