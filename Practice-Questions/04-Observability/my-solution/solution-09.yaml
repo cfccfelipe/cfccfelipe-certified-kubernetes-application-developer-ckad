@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: crashing-pod
+  labels:
+    test: crash-loop
+spec:
+  containers:
+  - name: sleeper-crasher
+    image: busybox:1.28
+    command: ["/bin/sh"]
+    args:
+    - "-c"
+    - "echo 'La aplicacion esta corriendo...'; sleep 30; echo 'Oh no, error fatal!'; exit 1"
+  # restartPolicy define que hara Kubernetes cuando el contenedor falle
+  restartPolicy: OnFailure
