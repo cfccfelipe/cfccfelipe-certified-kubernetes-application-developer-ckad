@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-issue-pod
+spec:
+  containers:
+  # 1. ISSUE: ImagePullBackOff (Imagen inexistente)
+  - name: error-image
+    image: nginx 
+  
+  # 2. ISSUE: Liveness Probe Failure (Falla de sonda)
+  - name: error-probe
+    image: busybox
+    command: ["/bin/sh", "-c"]
+    args:
+    - "touch /tmp/archivo-que-no-exite && sleep 600"
+    livenessProbe:
+      exec:
+        command: ["cat", "/tmp/archivo-que-no-existe"]
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+  # 3. ISSUE: OOMKilled (Límite de memoria excedido)
+  - name: error-oom
+    image: python:3.9-slim
+    command: ["python", "-c"]
+    # Este script crea una lista que consume ~250MB de RAM inmediatamente
+    args: ["a = b' ' * 250000000; import time; time.sleep(600)"]
+    resources:
+      limits:
+        memory: "300Mi" # El límite es mucho menor a los 250MB que pedimos
