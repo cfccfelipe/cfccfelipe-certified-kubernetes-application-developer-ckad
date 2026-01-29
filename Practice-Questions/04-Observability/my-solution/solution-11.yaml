@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-http
+spec:
+  containers:
+  - name: liveness
+    image: nginx
+    command: ["/bin/sh", "-c"]
+    args: 
+    - |
+      # Creamos una configuración rápida que solo responda 200 si el header es correcto
+      echo 'server {
+        listen 80;
+        location /healthz {
+          if ($http_x_custom_header != "health-check") {
+            return 403;
+          }
+          return 200 "healthy\n";
+        }
+      }' > /etc/nginx/conf.d/default.conf;
+      nginx -g "daemon off;"
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 80
+        httpHeaders:
+        - name: X-Custom-Header
+          value: health-check
+      initialDelaySeconds: 5
+      periodSeconds: 5
