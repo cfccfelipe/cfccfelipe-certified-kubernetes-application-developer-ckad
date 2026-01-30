@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pp
+spec:
+  replicas: 5 # Creamos 5 iguales para que el "falla" se camufle
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      labels:
+        app: web-server
+    spec:
+      containers:
+      - name: python-app
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Si el hostname termina en '4', simulamos el fallo silencioso
+            if [ "${HOSTNAME##*-}" = "4" ]; then
+                echo "Iniciando..." 
+                sleep 20
+                # Muere en silencio: no hay logs, no hay proceso, pero el contenedor sigue vivo
+                exit 1 2>/dev/null & 
+                tail -f /dev/null
+            else
+                python3 -m http.server 8080
+            fi
+        
+        # PROBE ENGAÑOSO: El Pod dirá "READY 1/1" aunque la app no esté
+        readinessProbe:
+          exec:
+            command: ["ls", "/etc/passwd"] # Siempre tendrá éxito
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+        # LIVENESS AGRESIVO (Pero mal configurado a propósito)
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 60 # Le damos demasiado tiempo, nunca detectará el fallo de los 20s
+          periodSeconds: 10
