@@ -7,11 +7,11 @@
 **Tasks:**
 1. Review the deployment in `app-deployment.yaml` which has hardcoded credentials
 2. Create a Secret named `db-credentials` with:
-   - `DB_USER=admin`
-   - `DB_PASS=SecurePassword123!`
-3. Update the deployment to use `valueFrom.secretKeyRef` instead of hardcoded values
-4. Verify the deployment rolled out successfully
-5. Verify the environment variables in the pod
+   - `DB_USER=admin` YWRtaW4K
+   - `DB_PASS=SecurePassword123!` U2VjdXJlUGFzc3dvcmQxMjMhCg==
+1. Update the deployment to use `valueFrom.secretKeyRef` instead of hardcoded values
+2. Verify the deployment rolled out successfully
+3. Verify the environment variables in the pod
 
 **Files:** `app-deployment.yaml`
 **Solution:** See `solution-01.md`

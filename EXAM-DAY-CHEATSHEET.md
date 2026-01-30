@@ -142,6 +142,7 @@ k run busybox --image=busybox --rm -it --restart=Never -- nslookup kubernetes
 
 # Test connectivity
 k run curl --image=curlimages/curl --rm -it --restart=Never -- curl http://service:80
+kubectl exec <pod> -- cat /etc/resolv.conf
 ```
 
 ---

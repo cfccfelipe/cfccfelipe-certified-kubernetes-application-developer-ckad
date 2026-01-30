@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pp
+spec:
+  replicas: 5 # Creamos 5 iguales para que el "falla" se camufle
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: python-app
+        image: python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            # Convertimos el hostname en un número sumando sus caracteres ASCII
+            SUM=$(printf '%s' "$HOSTNAME" | cksum | cut -f1 -d' ')
+            # Si el residuo de dividir por 5 es 0, este Pod será el "zombi"
+            if [ $((SUM % 5)) -eq 0 ]; then
+                echo "Modificador de falla activado para: $HOSTNAME"
+                sleep 20
+                exit 1 2>/dev/null &
+                tail -f /dev/null
+            else
+                python3 -m http.server 8080
+            fi
+        
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
+        # PROBE ENGAÑOSO: El Pod dirá "READY 1/1" aunque la app no esté
+        readinessProbe:
+          exec:
+            command: ["ls", "/etc/passwd"] # Siempre tendrá éxito
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+        # LIVENESS AGRESIVO (Pero mal configurado a propósito)
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5 # Le damos demasiado tiempo, nunca detectará el fallo de los 20s
+          periodSeconds: 10

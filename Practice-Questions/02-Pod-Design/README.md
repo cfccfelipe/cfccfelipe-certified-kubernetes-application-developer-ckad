@@ -250,8 +250,8 @@
 1. Create deployment with 5 replicas
 2. Create PodDisruptionBudget: minAvailable=3
 3. Try to drain a node
-4. Verify PDB prevents too many pods from being evicted
-5. Understand voluntary vs involuntary disruptions
+	1. Verify PDB prevents too many pods from being evicted
+4. Understand voluntary vs involuntary disruptions
 
 ---
 
