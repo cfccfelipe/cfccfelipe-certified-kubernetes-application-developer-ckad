@@ -1,0 +1,46 @@
+# 1. GUARANTEED: Máxima prioridad. (Requests == Limits)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qos-guaranteed
+  labels:
+    tier: critical
+spec:
+  containers:
+  - name: nginx
+    image: nginx:alpine
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "100m"
+        memory: "128Mi"
+---
+# 2. BURSTABLE: Flexible. (Requests < Limits)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qos-burstable
+spec:
+  containers:
+  - name: python-app
+    image: python:3.11-slim
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+---
+# 3. BEST-EFFORT: Sin recursos. (Será el primero en morir si el nodo se llena)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: qos-best-effort
+spec:
+  containers:
+  - name: busybox
+    image: busybox
+    command: ["sleep", "3600"]
